@@ -1,0 +1,19 @@
+system:
+  preferredShell: PowerShell
+  shellCommandExecutionEnabled: true
+  description: ""
+
+api:
+  key: your-secure-api-key
+
+logging:
+  level:
+    root: INFO
+    org.springframework.security: DEBUG
+    net.grayfallstown: DEBUG
+
+project:
+  dir: C:\Users\mk\IdeaProjects\java\myprojects\chatgpt-file-and-command-center\sampleproject
+  apiKey: your-secure-api-key
+  workingDir: C:\Users\mk\IdeaProjects\java\myprojects\chatgpt-file-and-command-center\sampleproject\workingdir
+  systemDescription: ""
