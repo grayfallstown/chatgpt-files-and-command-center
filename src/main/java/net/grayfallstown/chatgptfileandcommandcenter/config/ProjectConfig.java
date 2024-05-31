@@ -6,6 +6,10 @@ import org.springframework.context.annotation.Configuration;
 
 import javax.annotation.PostConstruct;
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.UUID;
 
 @Data
 @Configuration
@@ -34,8 +38,26 @@ public class ProjectConfig {
     }
 
     @PostConstruct
-    public void validateConfiguration() {
+    public void validateConfiguration() throws IOException {
         validateDirectoryExists(this.dir, "Project directory");
         validateDirectoryExists(this.workingDir, "Working directory");
+
+        // Read API key from apikey.txt
+        File apiKeyFile = new File(dir, "apikey.txt");
+        if (!apiKeyFile.exists()) {
+            generateAndSaveApiKey(apiKeyFile);
+        }
+        this.apiKey = new String(Files.readAllBytes(apiKeyFile.toPath())).trim();
+    }
+
+    private void generateAndSaveApiKey(File apiKeyFile) throws IOException {
+        String apiKey = UUID.randomUUID().toString();
+        Files.write(apiKeyFile.toPath(), apiKey.getBytes());
+    }
+
+    public void regenerateApiKey() throws IOException {
+        File apiKeyFile = new File(dir, "apikey.txt");
+        generateAndSaveApiKey(apiKeyFile);
+        this.apiKey = new String(Files.readAllBytes(apiKeyFile.toPath())).trim();
     }
 }

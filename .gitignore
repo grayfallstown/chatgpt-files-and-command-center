@@ -6,7 +6,7 @@ target/
 
 sampleproject
 llm.min.*
-
+apikey.txt
 
 ### STS ###
 .apt_generated

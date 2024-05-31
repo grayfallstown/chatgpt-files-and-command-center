@@ -3,57 +3,60 @@ package net.grayfallstown.chatgptfileandcommandcenter.git;
 import net.grayfallstown.chatgptfileandcommandcenter.config.ProjectConfig;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
-import org.eclipse.jgit.lib.Repository;
+import org.eclipse.jgit.errors.RepositoryNotFoundException;
+import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 @Service
 public class GitSyncService {
-    private static final Logger logger = LoggerFactory.getLogger(GitSyncService.class);
 
     private final ProjectConfig projectConfig;
-    private final BranchSynchronizer branchSynchronizer;
-    private final IgnoreRulesHandler ignoreRulesHandler;
-    private final FileTracker fileTracker;
+    private Git git;
 
-    public GitSyncService(ProjectConfig projectConfig, BranchSynchronizer branchSynchronizer, IgnoreRulesHandler ignoreRulesHandler, FileTracker fileTracker) {
+    public GitSyncService(ProjectConfig projectConfig) throws IOException, IllegalStateException, GitAPIException {
         this.projectConfig = projectConfig;
-        this.branchSynchronizer = branchSynchronizer;
-        this.ignoreRulesHandler = ignoreRulesHandler;
-        this.fileTracker = fileTracker;
+        initializeRepository();
     }
 
-    public void createNewRepository() throws IOException {
-        var repoPath = projectConfig.getDir() + "/historyRepo";
-        var workTreePath = projectConfig.getWorkingDir();
-
-        logger.info("Creating new repository at {}", repoPath);
+    public void initializeRepository() throws IOException, IllegalStateException, GitAPIException {
+        File repoDir = new File(projectConfig.getDir(), "historyRepo");
         FileRepositoryBuilder builder = new FileRepositoryBuilder();
-        builder.setGitDir(new File(repoPath))
-               .setWorkTree(new File(workTreePath))
-               .readEnvironment()
-               .findGitDir();
-
-        Repository repository = builder.build();
-        repository.create();
-        logger.info("Repository created successfully at {}", repoPath);
+        try {
+            git = new Git(builder.setGitDir(new File(repoDir, ".git"))
+                    .readEnvironment()
+                    .findGitDir()
+                    .build());
+        } catch (RepositoryNotFoundException e) {
+            git = Git.init().setDirectory(repoDir).call();
+            git.commit().setMessage("initial commit").call();
+        }
     }
 
-    public void addAllAndCommit(String commitMessage) throws IOException, GitAPIException {
-        var repoPath = projectConfig.getDir() + "/historyRepo";
+    public void addAllAndCommit(String message) throws GitAPIException {
+        git.add().addFilepattern(".").call();
+        git.commit().setMessage(message).call();
+    }
 
-        try (Git git = Git.open(new File(repoPath))) {
-            logger.info("Opening repository at {}", repoPath);
-            var ignorePatterns = ignoreRulesHandler.loadGitIgnore(projectConfig.getWorkingDir());
-            logger.info("Loaded ignore patterns: {}", ignorePatterns);
-            fileTracker.addFilesRecursively(git, new File(git.getRepository().getWorkTree().getPath()), ignorePatterns);
-            git.commit().setMessage(commitMessage).call();
-            logger.info("Committed changes with message: {}", commitMessage);
+    public List<String> gitlog() throws GitAPIException, IOException {
+        List<String> logs = new ArrayList<>();
+        Iterable<RevCommit> commits = git.log().call();
+        List<RevCommit> commitList = new ArrayList<>();
+        commits.forEach(commitList::add);
+
+        // Sort commits in chronological order (ascending)
+        Collections.reverse(commitList);
+
+        for (RevCommit commit : commitList) {
+            logs.add(commit.getId().getName() + " - " + commit.getFullMessage());
         }
+
+        return logs;
     }
 }

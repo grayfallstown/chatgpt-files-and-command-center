@@ -1,10 +1,12 @@
 package net.grayfallstown.chatgptfileandcommandcenter.web;
 
 import net.grayfallstown.chatgptfileandcommandcenter.git.GitSyncService;
+import org.eclipse.jgit.api.errors.GitAPIException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,14 +51,14 @@ public class FileController {
                         responses.add("ERROR: Unknown operation '" + operation.getFileOperation() + "'");
                 }
             } catch (Exception e) {
-                responses.add("ERROR: "+ e.getClass().getSimpleName() + " " + e.getMessage());
+                responses.add("ERROR: " + e.getClass().getSimpleName() + " " + e.getMessage());
             }
         }
 
         try {
             gitSyncService.addAllAndCommit(request.getCommitMessage());
         } catch (Exception e) {
-            responses.add("ERROR: Commit failed - "+ e.getClass().getSimpleName() + " " + e.getMessage());
+            responses.add("ERROR: Commit failed - " + e.getClass().getSimpleName() + " " + e.getMessage());
         }
 
         return ResponseEntity.ok(responses);
@@ -69,7 +71,7 @@ public class FileController {
             gitSyncService.addAllAndCommit(request.getCommitMessage());
             return ResponseEntity.ok("'" + request.getPath() + "' written");
         } catch (Exception e) {
-            return ResponseEntity.status(500).body("ERROR: "+ e.getClass().getSimpleName() + " " + e.getMessage());
+            return ResponseEntity.status(500).body("ERROR: " + e.getClass().getSimpleName() + " " + e.getMessage());
         }
     }
 
@@ -80,7 +82,7 @@ public class FileController {
             gitSyncService.addAllAndCommit(request.getCommitMessage());
             return ResponseEntity.ok("'" + request.getPath() + "' deleted");
         } catch (Exception e) {
-            return ResponseEntity.status(500).body("ERROR: "+ e.getClass().getSimpleName() + " " + e.getMessage());
+            return ResponseEntity.status(500).body("ERROR: " + e.getClass().getSimpleName() + " " + e.getMessage());
         }
     }
 
@@ -91,7 +93,7 @@ public class FileController {
             gitSyncService.addAllAndCommit(request.getCommitMessage());
             return ResponseEntity.ok("'" + request.getFrom() + "' moved to '" + request.getTo() + "'");
         } catch (Exception e) {
-            return ResponseEntity.status(500).body("ERROR: "+ e.getClass().getSimpleName() + " " + e.getMessage());
+            return ResponseEntity.status(500).body("ERROR: " + e.getClass().getSimpleName() + " " + e.getMessage());
         }
     }
 
@@ -111,7 +113,7 @@ public class FileController {
             String content = fileService.listFiles(path, recursive, ignoreGitIgnore);
             return ResponseEntity.ok(new FileOperationResponse(path, content, "Listed files successfully"));
         } catch (Exception e) {
-            return ResponseEntity.status(500).body(new FileOperationResponse(path, null, "ERROR: "+ e.getClass().getSimpleName() + " " + e.getMessage()));
+            return ResponseEntity.status(500).body(new FileOperationResponse(path, null, "ERROR: " + e.getClass().getSimpleName() + " " + e.getMessage()));
         }
     }
 }
