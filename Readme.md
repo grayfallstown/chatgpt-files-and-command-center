@@ -38,7 +38,7 @@ Once the folder and config.yaml are created by you, start the ChatGPT File and C
 - **File History:** File changes are tracked in a seperate git repository.
 - **Multi Project Support:** Supports multiple projects, which you can map to different ChatGPT chats.
 - **Security:** API key-based authentication.
-- **Command Excecution:** ❌ (not implemented yet) Let ChatGPT execute Shell Commands like `npm run build` on your Computer.
+- **Command Excecution:** Let ChatGPT execute Shell Commands like `npm run build` on your Computer.
 
 
 ## 🛠️ Getting Started
