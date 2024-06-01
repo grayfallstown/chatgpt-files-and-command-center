@@ -24,6 +24,7 @@ logging:
     org.springframework.security: DEBUG
     net.grayfallstown: DEBUG
     org.springdoc: DEBUG
+    org.springframework.web: DEBUG  # Add this line to log web requests
 
 springdoc:
   api-docs:
