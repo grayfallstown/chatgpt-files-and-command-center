@@ -1,0 +1,8 @@
+Prevent Timing attacks
+
+Detection of outside changes
+
+multiproject setup:
+- add api key to path
+- have a projects folder (maybe in userdir?)
+- auto find all projects + watch

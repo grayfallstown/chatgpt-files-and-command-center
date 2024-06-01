@@ -1,6 +1,6 @@
-package net.grayfallstown.chatgptfileandcommandcenter.git;
+package net.grayfallstown.chatgptfileandcommandcenter.history;
 
-import net.grayfallstown.chatgptfileandcommandcenter.config.ProjectConfig;
+import net.grayfallstown.chatgptfileandcommandcenter.project.ProjectConfig;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.errors.RepositoryNotFoundException;
@@ -17,15 +17,9 @@ import java.util.List;
 @Service
 public class GitSyncService {
 
-    private final ProjectConfig projectConfig;
     private Git git;
 
-    public GitSyncService(ProjectConfig projectConfig) throws IOException, IllegalStateException, GitAPIException {
-        this.projectConfig = projectConfig;
-        initializeRepository();
-    }
-
-    public void initializeRepository() throws IOException, IllegalStateException, GitAPIException {
+    public void initializeRepository(ProjectConfig projectConfig) throws IOException, IllegalStateException, GitAPIException {
         File repoDir = new File(projectConfig.getDir(), "historyRepo");
         FileRepositoryBuilder builder = new FileRepositoryBuilder();
         try {
@@ -39,12 +33,14 @@ public class GitSyncService {
         }
     }
 
-    public void addAllAndCommit(String message) throws GitAPIException {
+    public void addAllAndCommit(String message, ProjectConfig projectConfig) throws GitAPIException, IOException {
+        initializeRepository(projectConfig);
         git.add().addFilepattern(".").call();
         git.commit().setMessage(message).call();
     }
 
-    public List<String> gitlog() throws GitAPIException, IOException {
+    public List<String> gitlog(ProjectConfig projectConfig) throws GitAPIException, IOException {
+        initializeRepository(projectConfig);
         List<String> logs = new ArrayList<>();
         Iterable<RevCommit> commits = git.log().call();
         List<RevCommit> commitList = new ArrayList<>();

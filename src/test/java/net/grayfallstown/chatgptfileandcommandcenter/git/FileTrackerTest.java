@@ -14,6 +14,8 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
+import net.grayfallstown.chatgptfileandcommandcenter.history.FileTracker;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;

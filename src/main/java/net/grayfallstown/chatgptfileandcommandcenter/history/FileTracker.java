@@ -1,4 +1,4 @@
-package net.grayfallstown.chatgptfileandcommandcenter.git;
+package net.grayfallstown.chatgptfileandcommandcenter.history;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;

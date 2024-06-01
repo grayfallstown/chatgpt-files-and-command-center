@@ -1,28 +1,31 @@
-package net.grayfallstown.chatgptfileandcommandcenter.web;
+package net.grayfallstown.chatgptfileandcommandcenter.history;
+
+import net.grayfallstown.chatgptfileandcommandcenter.project.ProjectManager;
+import net.grayfallstown.chatgptfileandcommandcenter.project.ProjectConfig;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import net.grayfallstown.chatgptfileandcommandcenter.git.GitSyncService;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.List;
 
 @RestController
-@RequestMapping("/git")
+@RequestMapping("/api/{apiKey}/git")
 public class GitController {
+
+    @Autowired
+    private ProjectManager projectManager;
 
     @Autowired
     private GitSyncService gitSyncService;
 
     @GetMapping("/log")
-    public ResponseEntity<List<String>> getGitLog() {
+    public ResponseEntity<List<String>> getGitLog(@PathVariable String apiKey) {
+        ProjectConfig projectConfig = projectManager.getProjectConfig(apiKey);
         try {
-            List<String> logs = gitSyncService.gitlog();
+            List<String> logs = gitSyncService.gitlog(projectConfig);
             return ResponseEntity.ok(logs);
         } catch (GitAPIException | IOException e) {
             return ResponseEntity.status(500).body(List.of("ERROR: " + e.getClass().getSimpleName() + " " + e.getMessage()));

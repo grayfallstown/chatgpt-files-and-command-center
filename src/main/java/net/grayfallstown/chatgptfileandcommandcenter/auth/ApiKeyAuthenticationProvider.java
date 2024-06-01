@@ -1,4 +1,5 @@
-package net.grayfallstown.chatgptfileandcommandcenter.config;
+/*
+package net.grayfallstown.chatgptfileandcommandcenter.auth;
 
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.core.Authentication;
@@ -27,3 +28,4 @@ public class ApiKeyAuthenticationProvider implements AuthenticationProvider {
         return PreAuthenticatedAuthenticationToken.class.isAssignableFrom(authentication);
     }
 }
+ */

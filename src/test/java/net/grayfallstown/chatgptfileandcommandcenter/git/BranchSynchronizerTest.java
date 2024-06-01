@@ -12,6 +12,8 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
+import net.grayfallstown.chatgptfileandcommandcenter.history.BranchSynchronizer;
+
 import java.io.File;
 import java.io.IOException;
 

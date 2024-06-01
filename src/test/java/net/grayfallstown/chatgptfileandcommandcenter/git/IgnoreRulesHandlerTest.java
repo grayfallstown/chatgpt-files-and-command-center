@@ -4,6 +4,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
+import net.grayfallstown.chatgptfileandcommandcenter.history.IgnoreRulesHandler;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;

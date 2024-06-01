@@ -3,14 +3,18 @@ system:
   shellCommandExecutionEnabled: true
   description: ""
 
-api:
-  key: your-api-key
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
 
 logging:
   level:
     root: INFO
     org.springframework.security: DEBUG
     net.grayfallstown: DEBUG
+    org.springdoc: DEBUG
 
 springdoc:
   api-docs:
@@ -18,8 +22,10 @@ springdoc:
   swagger-ui:
     path: /swagger-ui.html
 
-project:
-  dir: C:\Users\mk\IdeaProjects\java\myprojects\chatgpt-file-and-command-center\sampleproject
-  apiKey: your-secure-api-key
-  workingDir: C:\Users\mk\IdeaProjects\java\myprojects\chatgpt-file-and-command-center\sampleproject\workingdir
-  systemDescription: ""
+projectsDir: C:\Users\mk\IdeaProjects\java\myprojects\chatgpt-file-and-command-center\projects\
+
+#
+#project:
+#  dir: C:\Users\mk\IdeaProjects\java\myprojects\chatgpt-file-and-command-center\sampleproject
+#  workingDir: C:\Users\mk\IdeaProjects\java\myprojects\chatgpt-file-and-command-center\sampleproject\workingdir
+#  systemDescription: ""
