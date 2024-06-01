@@ -1,8 +1,3 @@
-system:
-  preferredShell: PowerShell
-  shellCommandExecutionEnabled: true
-  description: ""
-
 management:
   endpoints:
     web:

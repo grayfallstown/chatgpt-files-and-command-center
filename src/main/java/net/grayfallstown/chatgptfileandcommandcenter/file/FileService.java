@@ -12,6 +12,7 @@ import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 
 @Service
 public class FileService {
@@ -21,10 +22,11 @@ public class FileService {
         try {
             Path filePath = validatePathInsideWorkingDir(path, projectConfig);
             FileUtils.forceMkdirParent(filePath.getParent().toFile());
-            if (Files.exists(filePath) && !Files.isWritable(filePath)) {
-                throw new FileOperationException("File exists but is not writable: " + filePath.toString());
+            if (Files.exists(filePath)) {
+                Files.delete(filePath);
             }
-            Files.write(filePath, content.getBytes());
+            Files.write(filePath, content.getBytes(),
+                StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE);
             logger.info("File written: {}", path);
         } catch (IOException e) {
             logger.error("Failed to write file: {}", path, e);
