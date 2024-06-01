@@ -1,6 +1,8 @@
 package net.grayfallstown.chatgptfileandcommandcenter.file;
 
 import net.grayfallstown.chatgptfileandcommandcenter.project.ProjectConfig;
+
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -18,6 +20,10 @@ public class FileService {
     public void writeFile(String path, String content, ProjectConfig projectConfig) {
         try {
             Path filePath = validatePathInsideWorkingDir(path, projectConfig);
+            FileUtils.forceMkdirParent(filePath.getParent().toFile());
+            if (Files.exists(filePath) && !Files.isWritable(filePath)) {
+                throw new FileOperationException("File exists but is not writable: " + filePath.toString());
+            }
             Files.write(filePath, content.getBytes());
             logger.info("File written: {}", path);
         } catch (IOException e) {
@@ -41,6 +47,10 @@ public class FileService {
         try {
             Path fromPath = validatePathInsideWorkingDir(from, projectConfig);
             Path toPath = validatePathInsideWorkingDir(to, projectConfig);
+            FileUtils.forceMkdirParent(toPath.getParent().toFile());
+            if (toPath.toFile().exists()) {
+                Files.delete(toPath);
+            }
             Files.move(fromPath, toPath);
             logger.info("File moved from {} to {}", from, to);
         } catch (IOException e) {
