@@ -9,6 +9,9 @@ projects
 llm.min.*
 apikey.txt
 TODO.txt
+hs_err*
+keystore.p12
+
 
 ### STS ###
 .apt_generated
