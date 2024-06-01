@@ -24,7 +24,12 @@ logging:
     org.springframework.security: DEBUG
     net.grayfallstown: DEBUG
     org.springdoc: DEBUG
-    org.springframework.web: DEBUG  # Add this line to log web requests
+  file:
+    path: ./logs/chatgpt-command-and-control-center.log
+  pattern:
+    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %logger{36} - %msg%n"
+  logback:
+    configuration: classpath:logback-spring.xml
 
 springdoc:
   api-docs:

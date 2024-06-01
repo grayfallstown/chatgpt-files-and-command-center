@@ -1,21 +1,25 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-
-    <property name="LOG_PATTERN" value="%d{HH:mm:ss.SSSXXX}\t%5p\t%logger{0} : %m%n"/>
 
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>${LOG_PATTERN}</pattern>
-            <charset>UTF-8</charset>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>./logs/chatgpt-command-and-control-center.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>chatgpt-command-and-control-center.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %logger{36} - %msg%n</pattern>
         </encoder>
     </appender>
 
     <root level="INFO">
         <appender-ref ref="CONSOLE" />
+        <appender-ref ref="FILE" />
     </root>
-
-    <logger name="org.springframework" level="INFO" />
-    <logger name="net.grayfallstown" level="DEBUG" />
-    <logger name="org.springdoc" level="DEBUG" />
 
 </configuration>
