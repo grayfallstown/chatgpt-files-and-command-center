@@ -43,7 +43,7 @@ public class CommandController {
         StreamingResponseBody stream = out -> {
             ExecutorService executor = Executors.newSingleThreadExecutor();
             Future<?> future = executor.submit(() -> {
-                ProcessBuilder processBuilder = new ProcessBuilder(shell, "/c", command)
+                ProcessBuilder processBuilder = new ProcessBuilder(shell, "-Command", command)
                         .directory(new File(workingDir))
                         .redirectErrorStream(true);
 
