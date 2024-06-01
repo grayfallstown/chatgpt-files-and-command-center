@@ -2,7 +2,6 @@ package net.grayfallstown.chatgptfileandcommandcenter.command;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import net.grayfallstown.chatgptfileandcommandcenter.project.ProjectConfig;
 import net.grayfallstown.chatgptfileandcommandcenter.project.ProjectManager;
