@@ -8,6 +8,7 @@ sampleproject
 projects
 llm.min.*
 apikey.txt
+TODO.txt
 
 ### STS ###
 .apt_generated

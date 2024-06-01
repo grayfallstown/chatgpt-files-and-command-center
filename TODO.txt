@@ -1,8 +1,52 @@
-Prevent Timing attacks
-
 Detection of outside changes
 
+sysinfo endpoint
+gitlog with files changed
+git history of a given path
+
 multiproject setup:
-- add api key to path
-- have a projects folder (maybe in userdir?)
 - auto find all projects + watch
+
+
+
+Suggestions for Missing Features and Improvements
+
+    Re-enable and Enhance Security:
+        Re-enable the API key-based authentication to secure the endpoints.
+        Consider adding more granular security rules and roles if needed.
+We hade many issues getting this to work and end up using the security in seen ProjectManager for now.
+Using spring-security would be great, we just did not get it working, even with help of ChatGPT and Gemini AI.
+
+
+    Input Validation:
+        Add validation for request parameters and bodies using annotations such as @Valid and @NotNull to ensure the data integrity before processing.
+Added.
+
+    Enhanced Error Handling:
+        Improve error handling by providing more specific exception classes for different error scenarios.
+Make specific suggestions in the codebase
+        Ensure that the global exception handler covers all potential exceptions and provides meaningful error messages.
+
+    Logging and Monitoring:
+        Enhance logging throughout the application to provide more visibility into the operations and potential issues.
+Add more logging to the codebase for us
+        Integrate monitoring tools (e.g., Prometheus, Grafana) to keep track of the application's performance and health metrics.
+Monitoring is not needed for this application. Performance does not matter.
+
+    Asynchronous Processing:
+        Consider using asynchronous processing for file operations, especially for batch operations, to improve the application's performance and responsiveness.
+Not needed, Performance does not matter
+
+    Testing Coverage:
+        Ensure comprehensive test coverage for all critical paths, including unit tests for services and controllers.
+        Add integration tests to verify the end-to-end functionality of the API.
+Postponed for now, but on the plan
+
+    File Metadata Management:
+        Add functionality to manage file metadata (e.g., timestamps, permissions) and include it in the API responses where applicable.
+For now, not needed
+
+    Improved Documentation:
+        Enhance the API documentation with detailed descriptions, examples, and usage scenarios.
+        Consider auto-generating client SDKs for different programming languages using the OpenAPI specification.
+Lets work on this together later

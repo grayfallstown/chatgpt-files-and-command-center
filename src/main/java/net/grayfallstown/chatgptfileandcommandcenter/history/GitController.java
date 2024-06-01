@@ -3,12 +3,10 @@ package net.grayfallstown.chatgptfileandcommandcenter.history;
 import net.grayfallstown.chatgptfileandcommandcenter.project.ProjectManager;
 import net.grayfallstown.chatgptfileandcommandcenter.project.ProjectConfig;
 
-import org.eclipse.jgit.api.errors.GitAPIException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -27,7 +25,7 @@ public class GitController {
         try {
             List<String> logs = gitSyncService.gitlog(projectConfig);
             return ResponseEntity.ok(logs);
-        } catch (GitAPIException | IOException e) {
+        } catch (GitOperationException e) {
             return ResponseEntity.status(500).body(List.of("ERROR: " + e.getClass().getSimpleName() + " " + e.getMessage()));
         }
     }

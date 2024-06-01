@@ -1,12 +1,14 @@
 package net.grayfallstown.chatgptfileandcommandcenter.file;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 
 @Data
 public class FileOperationRequest {
 
     @Schema(description = "Type of file operation (write, delete, move, read, listFiles)", required = true)
+    @NotEmpty(message = "File operation must not be empty")
     private String fileOperation;
 
     @Schema(description = "Path of the file to operate on, except for move operations")

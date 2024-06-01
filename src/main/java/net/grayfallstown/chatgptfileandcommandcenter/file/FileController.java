@@ -1,9 +1,7 @@
 package net.grayfallstown.chatgptfileandcommandcenter.file;
 
-import net.grayfallstown.chatgptfileandcommandcenter.project.ProjectManager;
 import net.grayfallstown.chatgptfileandcommandcenter.project.ProjectConfig;
-import net.grayfallstown.chatgptfileandcommandcenter.history.GitSyncService;
-
+import net.grayfallstown.chatgptfileandcommandcenter.project.ProjectManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,13 +12,8 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/{apiKey}/files")
 public class FileController {
-
     @Autowired
     private FileService fileService;
-
-    @Autowired
-    private GitSyncService gitSyncService;
-
     @Autowired
     private ProjectManager projectManager;
 
@@ -28,7 +21,6 @@ public class FileController {
     public ResponseEntity<List<Object>> handleBatchOperations(@PathVariable String apiKey, @RequestBody BatchFileOperationRequest request) {
         ProjectConfig projectConfig = projectManager.getProjectConfig(apiKey);
         List<Object> responses = new ArrayList<>();
-
         for (FileOperationRequest operation : request.getFileOperations()) {
             try {
                 switch (operation.getFileOperation().toLowerCase()) {
@@ -59,13 +51,6 @@ public class FileController {
                 responses.add("ERROR: " + e.getClass().getSimpleName() + " " + e.getMessage());
             }
         }
-
-        try {
-            gitSyncService.addAllAndCommit(request.getCommitMessage(), projectConfig);
-        } catch (Exception e) {
-            responses.add("ERROR: Commit failed - " + e.getClass().getSimpleName() + " " + e.getMessage());
-        }
-
         return ResponseEntity.ok(responses);
     }
 
@@ -74,7 +59,6 @@ public class FileController {
         ProjectConfig projectConfig = projectManager.getProjectConfig(apiKey);
         try {
             fileService.writeFile(request.getPath(), request.getContent(), projectConfig);
-            gitSyncService.addAllAndCommit(request.getCommitMessage(), projectConfig);
             return ResponseEntity.ok("'" + request.getPath() + "' written");
         } catch (Exception e) {
             return ResponseEntity.status(500).body("ERROR: " + e.getClass().getSimpleName() + " " + e.getMessage());
@@ -86,7 +70,6 @@ public class FileController {
         ProjectConfig projectConfig = projectManager.getProjectConfig(apiKey);
         try {
             fileService.deleteFile(request.getPath(), projectConfig);
-            gitSyncService.addAllAndCommit(request.getCommitMessage(), projectConfig);
             return ResponseEntity.ok("'" + request.getPath() + "' deleted");
         } catch (Exception e) {
             return ResponseEntity.status(500).body("ERROR: " + e.getClass().getSimpleName() + " " + e.getMessage());
@@ -98,7 +81,6 @@ public class FileController {
         ProjectConfig projectConfig = projectManager.getProjectConfig(apiKey);
         try {
             fileService.moveFile(request.getFrom(), request.getTo(), projectConfig);
-            gitSyncService.addAllAndCommit(request.getCommitMessage(), projectConfig);
             return ResponseEntity.ok("'" + request.getFrom() + "' moved to '" + request.getTo() + "'");
         } catch (Exception e) {
             return ResponseEntity.status(500).body("ERROR: " + e.getClass().getSimpleName() + " " + e.getMessage());
