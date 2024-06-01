@@ -12,8 +12,10 @@
   - [✨ Features](#-features)
   - [🛠️ Getting Started](#️-getting-started)
     - [Prerequisites](#prerequisites)
-    - [Installation](#installation)
+    - [installation](#installation)
+- [TODO](#todo)
     - [Configuration](#configuration)
+- [TODO](#todo-1)
   - [📚 API Endpoints](#-api-endpoints)
     - [File Operations](#file-operations)
     - [Git Operations](#git-operations)
@@ -44,38 +46,14 @@ Once the folder and config.yaml are created by you, start the ChatGPT File and C
 - Java 11 or higher
 - Maven
 
-### Installation
-1. Clone the repository:
-   ~~~bash
-   git clone https://github.com/yourusername/chatgpt-file-and-command-center.git
-   cd chatgpt-file-and-command-center
-   ~~~
+### installation
 
-2. Build the project:
-   ~~~bash
-   mvn clean install
-   ~~~
 
-3. Run the application:
-   ~~~bash
-   mvn spring-boot:run
-   ~~~
+# TODO
 
 ### Configuration
-Configuration is managed through the `application.yml` file located in `src/main/resources`. Here is an example configuration:
 
-~~~yaml
-logging:
-  level:
-    root: INFO
-    net.grayfallstown: DEBUG
-
-springdoc:
-  api-docs:
-    path: /v3/api-docs
-
-projectsDir: /path/to/your/projects
-~~~
+# TODO
 
 ## 📚 API Endpoints
 ### File Operations
