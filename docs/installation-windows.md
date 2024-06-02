@@ -65,7 +65,7 @@ Since Certbot no longer supports Windows directly, use `win-acme` to obtain a ce
 ## Wire Up the Certificate with Spring Boot
 
 1. Place the `keystore.p12` file in ChatGPT File And Command Center `./src/main/resources/`
-2. Copy `docs/example application.yml` to `./src/main/resources/application.yml` and change
+2. Copy `docs/example_application.yml` to `./src/main/resources/application.yml` and change
    the following lines:
     ```
     server:
