@@ -2,7 +2,7 @@
 # https://codebeautify.org/yaml-editor-online
 # It will tell you what you did wrong and where
 
-# Path to the working directory were the files you want ChatGPT to manage are located.
+# Path to the working directory where the files you want ChatGPT to manage are located.
 workingDir: /home/YouUserName/MyProjects/MyCurrentProject/
 # for windows
 # workingDir C:\\Users\YourUserName\MyProjects\MyCurrentProject
