@@ -1,4 +1,4 @@
-package net.grayfallstown.chatgptfileandcommandcenter.filter;
+package net.grayfallstown.chatgptfileandcommandcenter.common;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
