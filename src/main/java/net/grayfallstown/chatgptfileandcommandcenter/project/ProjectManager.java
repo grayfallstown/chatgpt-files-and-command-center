@@ -12,11 +12,13 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 @Component
 public class ProjectManager {
@@ -51,8 +53,12 @@ public class ProjectManager {
 
     private String loadApiKeyFromProjectDir(File projectDir) {
         try {
-            String apiKeyPath = Paths.get(projectDir.getPath(), "apikey.txt").toString();
-            return Files.readString(Paths.get(apiKeyPath)).trim();
+            Path apiKeyPath = Paths.get(projectDir.getPath(), "apikey.txt");
+            if (!Files.exists(apiKeyPath)) {
+                logger.info("creating missing api key for project {}", apiKeyPath.toString());
+                Files.write(apiKeyPath, UUID.randomUUID().toString().getBytes());
+            }
+            return Files.readString(apiKeyPath).trim();
         } catch (IOException e) {
             throw new RuntimeException("Failed to read API key from project directory: " + projectDir, e);
         }
