@@ -1,5 +1,10 @@
 # Installation Guide for Ubuntu
 
+The Goal of this guide is to make the ChatGPT File And Command Center available
+over the internet, so ChatGPT can actually use it. We will make the application
+reachable, create a DNS name for it and secure it with https. Feel free to ask
+ChatGPT for additional help with this.
+
 ## Configure Firewall to Allow Ports 8080, 80, and 443
 
 1. Open a terminal.
