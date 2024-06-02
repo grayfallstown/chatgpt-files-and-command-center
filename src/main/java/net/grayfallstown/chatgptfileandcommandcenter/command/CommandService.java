@@ -20,6 +20,8 @@ public class CommandService {
         try {
             // Create a script file in ./logs/commands/ directory
             Path scriptFile = createScriptFile(shell, command);
+            logger.info("Excetuting command sh: {}, cmd: {}, wd: {}, to: {}, sf: {}",
+                shell, command, workingDir, timeout, scriptFile);
 
             // Create a command line to execute the script
             CommandLine cmdLine = new CommandLine(shell);

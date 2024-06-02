@@ -12,11 +12,14 @@ import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Component
 public class RequestResponseLoggingFilter implements Filter {
 
     private static final Logger logger = LoggerFactory.getLogger(RequestResponseLoggingFilter.class);
+
+    private AtomicInteger counter = new AtomicInteger(0);
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
@@ -30,14 +33,15 @@ public class RequestResponseLoggingFilter implements Filter {
         HttpServletResponse httpResponse = (HttpServletResponse) response;
 
         // Log request URL and parameters
-        logger.info("Request URL: {} {}", httpRequest.getMethod(), httpRequest.getRequestURI());
+        int id  = counter.incrementAndGet();
+        logger.info("Request {} URL: {} {}", id, httpRequest.getMethod(), httpRequest.getRequestURI());
         httpRequest.getParameterMap().forEach((key, value) -> logger.info("Parameter: {}={}", key, String.join(",", value)));
 
         // Proceed with the next filter in the chain
         chain.doFilter(request, response);
 
         // Log response status
-        logger.info("Response Status: {}", httpResponse.getStatus());
+        logger.info("Response {} Status: {}", id, httpResponse.getStatus());
     }
 
     @Override

@@ -44,8 +44,8 @@ public class SystemInfoController {
             systemInfo.put("distribution", System.getProperty("os.name"));
             systemInfo.put("build", System.getProperty("os.version"));
             systemInfo.put("kernel", System.getProperty("os.arch"));
-            availableShells.add("cmd.exe");
-            availableShells.add("powershell.exe");
+            availableShells.add("cmd");
+            availableShells.add("powershell");
         } else {
             try {
                 ProcessBuilder processBuilder = new ProcessBuilder();
