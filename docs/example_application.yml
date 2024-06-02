@@ -1,0 +1,46 @@
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+  server:
+#### You need to change this to use your dns domain, see /docs/Readme.md
+    url: https://yourdnsname/
+
+#### This is where ChatGPT File And Command Center
+projectsDir: ./projects/
+
+server:
+  port: 443
+  ssl:
+    enabled: true
+    key-store: classpath:keystore.p12
+    key-store-type: PKCS12
+#### You need change this to match your certificate, see /docs/Readme.md
+    key-store-password: password
+#### You need change this to match your certificate, see /docs/Readme.md
+    key-alias: certificate alias
+
+
+################################################################
+##### Usually you do not need to change anything below this ####
+################################################################
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
+logging:
+  level:
+    root: INFO
+    org.springframework.security: DEBUG
+    net.grayfallstown: DEBUG
+    org.springdoc: DEBUG
+  file:
+    path: ./logs/chatgpt-command-and-control-center.log
+  pattern:
+    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %logger{36} - %msg%n"
+  logback:
+    configuration: classpath:logback-spring.xml

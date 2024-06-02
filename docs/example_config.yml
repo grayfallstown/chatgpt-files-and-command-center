@@ -1,0 +1,31 @@
+# If you have trouble with the syntax, use an online yaml editor like
+# https://codebeautify.org/yaml-editor-online
+# It will tell you what you did wrong and where
+
+# Path to the working directory were the files you want ChatGPT to manage are located.
+workingDir: /home/YouUserName/MyProjects/MyCurrentProject/
+# for windows
+# workingDir C:\\Users\YourUserName\MyProjects\MyCurrentProject
+
+# Restricts file API operations to the working directory if set to true
+# Access to entire filesystem via absolute paths if set to false
+restrictToWorkingDir: true
+
+# Allows command execution within the project if set to true
+# Important: Commands are not restricted to the working directory, even if
+# restrictToWorkingDir is set to true
+executeCommands: true
+
+# Brief description of your system setup, tools installed, available scripts, and
+# everything ChatGPT need to know about that.
+systemDescription: |
+  This system is configured with the following tools and scripts:
+  - Tools Installed:
+    - OpenJDK 11
+    - Maven 3.6.3
+    - Git 2.30.1
+  - Available Scripts:
+    - build.sh: Script to compile and build the project using Maven
+    - deploy.sh: Script to deploy the built project to the server
+    - test.sh: Script to run all unit tests and generate a test report
+

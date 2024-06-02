@@ -13,6 +13,8 @@ hs_err*
 keystore.p12
 logs
 test.txt
+historyRepo
+application.yml
 
 
 ### STS ###

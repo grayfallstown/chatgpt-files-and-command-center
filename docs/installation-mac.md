@@ -59,17 +59,18 @@ ChatGPT for additional help with this.
 
 ## Wire Up the Certificate with Spring Boot
 
-1. Place the `keystore.p12` file in your Spring Boot project’s resources directory.
-2. Add the following properties to your `application.yml`:
+1. Place the `keystore.p12` file in ChatGPT File And Command Center `./src/main/resources/`
+2. Copy `docs/example application.yml` to `./src/main/resources/application.yml` and change
+   the following lines:
     ```
     server:
-      port: 443
       ssl:
-        key-store: classpath:keystore.p12
         key-store-password: your-password
-        key-store-type: PKCS12
         key-alias: myalias
+    springdoc:
+      server:
+        url: https://yourdnsname/
     ```
-3. Restart your Spring Boot application.
+1. Start ChatGPT File And Command Center by running `./mvnw spring-boot:run`.
 
 Your Spring Boot application should now be accessible via HTTPS on port 443.
