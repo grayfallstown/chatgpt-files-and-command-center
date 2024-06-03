@@ -53,7 +53,8 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Object> handleCommandsDisabledException(CommandsDisabledException ex, WebRequest request) {
         logger.error("{}.", ex.getMessage());
         String chatGPTHint = " Notify the User that this feature can be enabled in " +
-            "the projects config.yaml by setting executeCommands to true";
+            "the projects config.yaml by setting executeCommands to true and restarting " + 
+            "ChatGPT File And Command Center.";
         return new ResponseEntity<>(ex.getMessage() + chatGPTHint, HttpStatus.BAD_REQUEST);
     }
 
