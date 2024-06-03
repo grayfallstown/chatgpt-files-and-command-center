@@ -21,6 +21,44 @@ server:
 #### You need change this to match your certificate, see /docs/Readme.md
     key-alias: certificate alias
 
+fileapi:
+  recursionDepthLimit: 10
+  responseSizeLimit: 8000 # Size in characters
+  deepDirectories:
+    - bin
+    - build
+    - coverage
+    - DerivedData
+    - dist
+    - env
+    - jspm_packages
+    - lib
+    - logs
+    - node_modules
+    - obj
+    - out
+    - target
+    - temp
+    - Thumbs.db
+    - tmp
+    - vendor
+    - venv
+    - xcuserdata
+    - .bundle
+    - .c9
+    - .DS_Store
+    - .git
+    - .gradle
+    - .history
+    - .idea
+    - .mvn
+    - .settings
+    - .terraform
+    - .vscode
+    - _ebin
+    - __pycache__
+
+
 
 ################################################################
 ##### Usually you do not need to change anything below this ####

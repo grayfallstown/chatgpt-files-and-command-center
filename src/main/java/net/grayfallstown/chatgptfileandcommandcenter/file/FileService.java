@@ -10,16 +10,22 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class FileService {
     private static final Logger logger = LoggerFactory.getLogger(FileService.class);
+
+    @Autowired
+    private FileAPIConfig fileAPIConfig;
 
     @Autowired
     private GitSyncService gitSyncService;
@@ -84,8 +90,14 @@ public class FileService {
             Path dirPath = validatePathInsideWorkingDir(path, projectConfig);
             StringBuilder fileList = new StringBuilder();
             IgnoreNode ignoreNode = gitSyncService.getIgnoreNode(dirPath);
-            Files.walk(dirPath, recursive ? Integer.MAX_VALUE : 1)
+            String responseTooLargeErrror = "\n\nERROR: File list too large, output truncated";
+            int limit = fileAPIConfig.getResponseSizeLimit() - responseTooLargeErrror.length();
+            logger.debug("response limit {}", limit);
+            List<Path> foundPaths = Files.walk(dirPath, recursive ? Integer.MAX_VALUE : 1)
                 .filter((filterPath) -> {
+                    if (filterPath.toString().contains(File.separator + ".git" + File.separator)) {
+                        return false;
+                    }
                     if (!ignoreGitIgnore) {
                         if (gitSyncService.isGitIgnored(dirPath, filterPath, ignoreNode)) {
                             return false;
@@ -96,8 +108,25 @@ public class FileService {
                     } else {
                         return Files.isRegularFile(filterPath) || Files.isDirectory(filterPath);
                     }
-                })
-                .forEach(p -> fileList.append(p.toString()).append("\n"));
+                }).collect(Collectors.toList());
+
+            Path workingDir = Paths.get(projectConfig.getWorkingDir());
+            for (Path foundPath : foundPaths) {
+                String filePath;
+                if (isPathInsideWorkingDir(foundPath, workingDir)) {
+                    Path relativePath = workingDir.toAbsolutePath().relativize(foundPath.toAbsolutePath());
+                    filePath = "./" + relativePath.toString();
+                } else {
+                    filePath = path;
+                }
+                fileList.append(filePath).append("\n");
+                if (fileList.length() + filePath.length() > limit) {
+                    fileList.append(responseTooLargeErrror);
+                    logger.warn("reached configured limit for listfiles, truncating");
+                    break;
+                }
+            }
+
             logger.info("Files listed in directory: {}", path);
             return fileList.toString();
         } catch (IOException e) {
@@ -113,13 +142,20 @@ public class FileService {
             if (!filePath.isAbsolute()) {
                 filePath = Paths.get(projectConfig.getWorkingDir(), path).normalize();
             }
-            Path workingDirPath = Paths.get(projectConfig.getWorkingDir()).normalize();
-            if (!filePath.startsWith(workingDirPath)) {
+            if (!isPathInsideWorkingDir(filePath, projectConfig.getWorkingDir())) {
                 throw new FileOperationException("Operation not allowed outside of working directory: " + path);
             }
         } catch (InvalidPathException e) {
             throw new FileOperationException("Invalid path: " + path, e);
         }
         return filePath;
+    }
+
+    private boolean isPathInsideWorkingDir(Path path, String workingDir) {
+        return isPathInsideWorkingDir(path, Paths.get(workingDir));
+    }
+
+    private boolean isPathInsideWorkingDir(Path path, Path workingDir) {
+        return path.startsWith(workingDir.normalize());
     }
 }

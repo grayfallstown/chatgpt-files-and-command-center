@@ -44,8 +44,7 @@ public class ProjectManager {
                 try {
                     String apiKey = loadApiKeyFromProjectDir(projectDir);
                     ProjectConfig projectConfig = loadProjectConfig(projectDir);
-                    String apiKeyHash = hashApiKey(apiKey);
-                    projectConfigs.put(apiKeyHash, projectConfig);
+                    projectConfigs.put(apiKey, projectConfig);
                 } catch (RuntimeException e) {
                     logger.error("Error in project setup: {}", e.getMessage());
                     throw e;
@@ -54,6 +53,7 @@ public class ProjectManager {
         } else {
             throw new RuntimeException("Projects directory not found: " + projectsDir);
         }
+        logger.debug("loaded these projects: {}", projectConfigs.values());
     }
 
     private String loadApiKeyFromProjectDir(File projectDir) {
@@ -84,9 +84,9 @@ public class ProjectManager {
 
     public ProjectConfig getProjectConfig(String apiKey) {
         // some resistance against timing attacks
-        String apiKeyHash = hashApiKey(apiKey);
         for (Map.Entry<String, ProjectConfig> entry : projectConfigs.entrySet()) {
-            if (constantTimeCompare(entry.getKey(), apiKeyHash)) {
+            if (constantTimeCompare(entry.getKey(), apiKey)) {
+                logger.info("opening project {}", entry.getValue().getDir());
                 return entry.getValue();
             }
         }

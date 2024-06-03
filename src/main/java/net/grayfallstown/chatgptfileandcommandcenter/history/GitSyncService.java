@@ -115,7 +115,6 @@ public class GitSyncService {
         Path relativePath = basePath.relativize(pathToCheck).normalize();
         boolean isDirectory = Files.isDirectory(pathToCheck);
         
-        logger.debug("Checking if path '{}' is ignored", relativePath);
         MatchResult result = ignoreNode.isIgnored(relativePath.toString(), isDirectory);
         
         return result == MatchResult.IGNORED;
