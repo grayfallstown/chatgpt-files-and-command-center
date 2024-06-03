@@ -4,6 +4,9 @@ import net.grayfallstown.chatgptfileandcommandcenter.project.ProjectConfig;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.errors.RepositoryNotFoundException;
+import org.eclipse.jgit.ignore.FastIgnoreRule;
+import org.eclipse.jgit.ignore.IgnoreNode;
+import org.eclipse.jgit.ignore.IgnoreNode.MatchResult;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.slf4j.Logger;
@@ -12,9 +15,12 @@ import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class GitSyncService {
@@ -75,5 +81,43 @@ public class GitSyncService {
             logger.error("Failed to retrieve git log for project: {}", projectConfig.getDir(), e);
             throw new GitOperationException("Failed to retrieve git log", e);
         }
+    }
+
+    public IgnoreNode getIgnoreNode(Path workingDir) {
+        return getIgnoreNode(getGitIgnorePatterns(workingDir));
+    }
+
+    public IgnoreNode getIgnoreNode(List<String> gitIgnorePatterns) {
+        IgnoreNode ignoreNode = new IgnoreNode(gitIgnorePatterns.stream()
+            .map(FastIgnoreRule::new).collect(Collectors.toList()));
+        return ignoreNode;
+    }
+
+    public List<String> getGitIgnorePatterns(Path workingDir) {
+        List<String> patterns = new ArrayList<>();
+        try (var paths = Files.walk(workingDir)) {
+            paths.filter(path -> path.getFileName().toString().equals(".gitignore"))
+                    .forEach(gitignore -> {
+                        try {
+                            patterns.addAll(Files.readAllLines(gitignore));
+                        } catch (IOException e) {
+                            throw new RuntimeException("Could not load gitignore patterns from file: " + gitignore, e);
+                        }
+                    });
+        } catch (IOException e) {
+            throw new RuntimeException("Could not walk the directory: " + workingDir, e);
+        }
+        logger.debug("ignore patterns {}", patterns);
+        return patterns;
+    }
+
+    public boolean isGitIgnored(Path basePath, Path pathToCheck, IgnoreNode ignoreNode) {
+        Path relativePath = basePath.relativize(pathToCheck).normalize();
+        boolean isDirectory = Files.isDirectory(pathToCheck);
+        
+        logger.debug("Checking if path '{}' is ignored", relativePath);
+        MatchResult result = ignoreNode.isIgnored(relativePath.toString(), isDirectory);
+        
+        return result == MatchResult.IGNORED;
     }
 }

@@ -1,10 +1,13 @@
 package net.grayfallstown.chatgptfileandcommandcenter.file;
 
+import net.grayfallstown.chatgptfileandcommandcenter.history.GitSyncService;
 import net.grayfallstown.chatgptfileandcommandcenter.project.ProjectConfig;
 
 import org.apache.commons.io.FileUtils;
+import org.eclipse.jgit.ignore.IgnoreNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -17,6 +20,9 @@ import java.nio.file.StandardOpenOption;
 @Service
 public class FileService {
     private static final Logger logger = LoggerFactory.getLogger(FileService.class);
+
+    @Autowired
+    private GitSyncService gitSyncService;
 
     public void writeFile(String path, String content, ProjectConfig projectConfig) {
         try {
@@ -77,8 +83,14 @@ public class FileService {
         try {
             Path dirPath = validatePathInsideWorkingDir(path, projectConfig);
             StringBuilder fileList = new StringBuilder();
+            IgnoreNode ignoreNode = gitSyncService.getIgnoreNode(dirPath);
             Files.walk(dirPath, recursive ? Integer.MAX_VALUE : 1)
                 .filter((filterPath) -> {
+                    if (!ignoreGitIgnore) {
+                        if (gitSyncService.isGitIgnored(dirPath, filterPath, ignoreNode)) {
+                            return false;
+                        }
+                    }
                     if (foldersOnly) {
                         return Files.isDirectory(filterPath);
                     } else {
