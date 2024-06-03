@@ -41,7 +41,9 @@ public class FileController {
                         responses.add(new FileOperationResponse(operation.getPath(), content, "Read successfully"));
                         break;
                     case "listfiles":
-                        String listContent = fileService.listFiles(operation.getPath(), operation.isRecursive(), operation.isIgnoreGitIgnore(), projectConfig);
+                        String listContent = fileService.listFiles(operation.getPath(),
+                            operation.isRecursive(), operation.isIgnoreGitIgnore(),
+                            operation.isFoldersOnly(), projectConfig);
                         responses.add(new FileOperationResponse(operation.getPath(), listContent, "Listed files successfully"));
                         break;
                     default:
@@ -99,10 +101,10 @@ public class FileController {
     }
 
     @GetMapping("/listfiles")
-    public ResponseEntity<FileOperationResponse> listFiles(@PathVariable String apiKey, @RequestParam String path, @RequestParam boolean recursive, @RequestParam boolean ignoreGitIgnore) {
+    public ResponseEntity<FileOperationResponse> listFiles(@PathVariable String apiKey, @RequestParam String path, @RequestParam boolean recursive, @RequestParam boolean ignoreGitIgnore, @RequestParam boolean foldersOnly) {
         ProjectConfig projectConfig = projectManager.getProjectConfig(apiKey);
         try {
-            String content = fileService.listFiles(path, recursive, ignoreGitIgnore, projectConfig);
+            String content = fileService.listFiles(path, recursive, ignoreGitIgnore, foldersOnly, projectConfig);
             return ResponseEntity.ok(new FileOperationResponse(path, content, "Listed files successfully"));
         } catch (Exception e) {
             return ResponseEntity.status(500).body(new FileOperationResponse(path, null, "ERROR: " + e.getClass().getSimpleName() + " " + e.getMessage()));

@@ -73,12 +73,18 @@ public class FileService {
         }
     }
 
-    public String listFiles(String path, boolean recursive, boolean ignoreGitIgnore, ProjectConfig projectConfig) {
+    public String listFiles(String path, boolean recursive, boolean ignoreGitIgnore, boolean foldersOnly, ProjectConfig projectConfig) {
         try {
             Path dirPath = validatePathInsideWorkingDir(path, projectConfig);
             StringBuilder fileList = new StringBuilder();
             Files.walk(dirPath, recursive ? Integer.MAX_VALUE : 1)
-                .filter(Files::isRegularFile)
+                .filter((filterPath) -> {
+                    if (foldersOnly) {
+                        return Files.isDirectory(filterPath);
+                    } else {
+                        return Files.isRegularFile(filterPath) || Files.isDirectory(filterPath);
+                    }
+                })
                 .forEach(p -> fileList.append(p.toString()).append("\n"));
             logger.info("Files listed in directory: {}", path);
             return fileList.toString();

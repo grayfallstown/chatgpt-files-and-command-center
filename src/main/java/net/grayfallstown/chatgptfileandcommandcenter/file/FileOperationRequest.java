@@ -26,8 +26,11 @@ public class FileOperationRequest {
     @Schema(description = "Short commit message for the operation. Required if this is not a batch request")
     private String commitMessage;
 
-    @Schema(description = "Flag to ignore .gitignore rules", defaultValue = "false")
+    @Schema(description = "Shows files and folder ignored by git", defaultValue = "false")
     private boolean ignoreGitIgnore;
+
+    @Schema(description = "Flag to only show folders", defaultValue = "false")
+    private boolean foldersOnly;
 
     @Schema(description = "Flag to list files recursively", defaultValue = "false")
     private boolean recursive;
