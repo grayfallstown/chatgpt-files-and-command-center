@@ -14,10 +14,15 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.attribute.FileAttribute;
+import java.nio.file.attribute.PosixFilePermission;
+import java.nio.file.attribute.PosixFilePermissions;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 @Component
@@ -57,6 +62,7 @@ public class ProjectManager {
             if (!Files.exists(apiKeyPath)) {
                 logger.info("creating missing api key for project {}", apiKeyPath.toString());
                 Files.write(apiKeyPath, UUID.randomUUID().toString().getBytes());
+                restrictToOwner(apiKeyPath);
             }
             return Files.readString(apiKeyPath).trim();
         } catch (IOException e) {
@@ -85,6 +91,27 @@ public class ProjectManager {
             }
         }
         throw new UnknownProjectException("Cannot find Project, Unknown API key");
+    }
+
+    private static void restrictToOwner(Path filePath) {
+        try {
+            if (System.getProperty("os.name").toLowerCase().contains("win")) {
+                ProcessBuilder pb = new ProcessBuilder("icacls", filePath.toString(), "/inheritance:r", "/grant", System.getProperty("user.name") + ":(R,W)");
+                Process p = pb.start();
+                p.waitFor();
+            } else {
+                // Define the file permissions to restrict access to the owner only
+                Set<PosixFilePermission> permissions = new HashSet<>();
+                permissions.add(PosixFilePermission.OWNER_READ);
+                permissions.add(PosixFilePermission.OWNER_WRITE);
+    
+                // Set the file permissions
+                Files.setPosixFilePermissions(filePath, permissions);
+            }
+        } catch(Exception e) {
+            throw new RuntimeException("could not restrict created apikey.txt to owner", e);
+        }
+        
     }
 
     private String hashApiKey(String apiKey) {
