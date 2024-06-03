@@ -4,7 +4,7 @@
     
     <groupId>net.grayfallstown</groupId>
     <artifactId>chatgpt-file-and-command-center</artifactId>
-    <version>1.0.0</version>
+    <version>0.1.0-alpha</version>
     <packaging>jar</packaging>
     
     <name>ChatGPT File and Command Center</name>
