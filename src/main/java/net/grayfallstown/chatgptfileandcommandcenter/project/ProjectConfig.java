@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.Nulls;
 
 import java.io.File;
+import java.nio.file.Paths;
 
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -44,12 +45,12 @@ public class ProjectConfig {
 
     public void setWorkingDir(String workingDir) {
         validateDirectoryExists(workingDir, "Working directory");
-        this.workingDir = workingDir;
+        this.workingDir = Paths.get(workingDir).normalize().toString();
     }
 
     public void setDir(String dir) {
         validateDirectoryExists(dir, "Project directory");
-        this.dir = dir;
+        this.dir = Paths.get(dir).normalize().toString();
     }
 
     private void validateDirectoryExists(String dirPath, String dirName) {
