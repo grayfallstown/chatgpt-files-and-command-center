@@ -38,6 +38,10 @@ public class CommandController {
         @Valid @RequestBody CommandRequest commandRequest
     ) {
         ProjectConfig projectConfig = projectManager.getProjectConfig(apiKey);
+        if (!projectConfig.isExecuteCommands()) {
+            throw new CommandsDisabledException("Command Execution disabled in project '" +
+                projectConfig.getDir() + "'");
+        }
         String workingDir = projectConfig.getWorkingDir();
         String command = commandRequest.getCommand();
         String shell = commandRequest.getShell();

@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 
+import net.grayfallstown.chatgptfileandcommandcenter.command.CommandsDisabledException;
 import net.grayfallstown.chatgptfileandcommandcenter.file.FileNotFoundException;
 import net.grayfallstown.chatgptfileandcommandcenter.file.FileOperationException;
 import net.grayfallstown.chatgptfileandcommandcenter.history.GitOperationException;
@@ -46,6 +47,14 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Object> handleValidationException(ValidationException ex, WebRequest request) {
         logger.error("Validation exception: {}", ex.getMessage());
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(CommandsDisabledException.class)
+    public ResponseEntity<Object> handleCommandsDisabledException(CommandsDisabledException ex, WebRequest request) {
+        logger.error("{}.", ex.getMessage());
+        String chatGPTHint = " Notify the User that this feature can be enabled in " +
+            "the projects config.yaml by setting executeCommands to true";
+        return new ResponseEntity<>(ex.getMessage() + chatGPTHint, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(Exception.class)
