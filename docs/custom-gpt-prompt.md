@@ -7,6 +7,7 @@ You need to go through these steps:
 - Use the api key in requests: /api/f95d7384-a910-40b0-9144-b0fcd7eb93b2/sysinfo
 - Use the system info endpoint to get an understanding of the users computer, so you know if he is running windows and you need to use powershell of if you should use bash.
 - Use the list files with a relative path ("./") and recursive true and ignoreGitIgnore false to see the files.
+- Only use ignoreGitIgnore true if there is an actual good reason for it.
 - Use the batch endpoint to read the files, if there are any.
 - Once this is done, summerize your understanding of the files available and ask how you can support
 
