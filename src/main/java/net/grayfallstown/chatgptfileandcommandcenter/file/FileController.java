@@ -101,13 +101,21 @@ public class FileController {
     }
 
     @GetMapping("/listfiles")
-    public ResponseEntity<FileOperationResponse> listFiles(@PathVariable String apiKey, @RequestParam String path, @RequestParam boolean recursive, @RequestParam boolean ignoreGitIgnore, @RequestParam boolean foldersOnly) {
+    public ResponseEntity<FileOperationResponse> listFiles(
+        @PathVariable String apiKey,
+        @RequestParam String path,
+        @RequestParam(required = false) boolean recursive,
+        @RequestParam(required = false) boolean ignoreGitIgnore,
+        @RequestParam(required = false) boolean foldersOnly
+    ) {
         ProjectConfig projectConfig = projectManager.getProjectConfig(apiKey);
         try {
             String content = fileService.listFiles(path, recursive, ignoreGitIgnore, foldersOnly, projectConfig);
             return ResponseEntity.ok(new FileOperationResponse(path, content, "Listed files successfully"));
         } catch (Exception e) {
-            return ResponseEntity.status(500).body(new FileOperationResponse(path, null, "ERROR: " + e.getClass().getSimpleName() + " " + e.getMessage()));
+            return ResponseEntity.status(500).body(
+                new FileOperationResponse(path, null,
+                    "ERROR: " + e.getClass().getSimpleName() + " " + e.getMessage()));
         }
     }
 }
