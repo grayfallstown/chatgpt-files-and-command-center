@@ -23,6 +23,9 @@ public class CommandController {
     private static final Logger logger = LoggerFactory.getLogger(CommandController.class);
 
     @Autowired
+    private ShellService shellService;
+
+    @Autowired
     private ProjectManager projectManager;
 
     @Autowired
@@ -44,12 +47,25 @@ public class CommandController {
         }
         String workingDir = projectConfig.getWorkingDir();
         String command = commandRequest.getCommand();
-        String shell = commandRequest.getShell();
+        String shellIdentifier = commandRequest.getShell();
+
+        // because of streamed output, GlobalExceptionHandler cannot undo the HttpStatus.OK used
+        if (!shellService.isShellAvailable(shellIdentifier)) {
+            String chatGPTHint = "Shell " + shellIdentifier + " not available. Shells available, address them by the listed identifier: " +
+                shellService.getAvailableShellNames() + ". If you think the user wants you " +
+                "to use that shell, tell him to add it to his application.yml and restart ChatGPT "
+                + "File And Command Center";
+                StreamingResponseBody stream = out -> {
+                    out.write(chatGPTHint.getBytes());
+                };
+                return new ResponseEntity<>(stream, HttpStatus.BAD_REQUEST);
+        }
+
         int timeout = commandRequest.getTimeout();
 
         StreamingResponseBody stream = out -> {
             ExecutorService executor = Executors.newSingleThreadExecutor();
-            Future<?> future = executor.submit(() -> commandService.executeShellCommand(shell, command, workingDir, timeout, out));
+            Future<?> future = executor.submit(() -> commandService.executeShellCommand(shellIdentifier, command, workingDir, timeout, out));
             try {
                 future.get(timeout + 1, TimeUnit.SECONDS);  // Add 1 second buffer to ensure process completion handling
             } catch (TimeoutException e) {

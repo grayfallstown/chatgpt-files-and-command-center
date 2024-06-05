@@ -58,6 +58,108 @@ fileapi:
     - _ebin
     - __pycache__
 
+shellconfig:
+  knownShells:
+    - identifier: powershell
+      executablePaths:
+        - C:/WINDOWS/System32/WindowsPowerShell/v1.0/powershell.exe
+        - /usr/bin/pwsh
+        - /usr/local/bin/pwsh
+      executionTemplate: "PATH_TO_SCRIPTFILE"
+      extension: ps1
+
+    - identifier: cmd
+      executablePaths:
+        - C:/WINDOWS/system32/cmd.exe
+      executionTemplate: "/c PATH_TO_SCRIPTFILE"
+      extension: bat
+
+    - identifier: bash
+      executablePaths:
+        - /bin/bash
+        - /usr/bin/bash
+        - /usr/local/bin/bash
+        - C:/Program Files/Git/bin/bash.exe
+      executionTemplate: "PATH_TO_SCRIPTFILE"
+      extension: sh
+
+    - identifier: zsh
+      executablePaths:
+        - /bin/zsh
+        - /usr/bin/zsh
+        - /usr/local/bin/zsh
+      executionTemplate: "PATH_TO_SCRIPTFILE"
+      extension: zsh
+
+    - identifier: fish
+      executablePaths:
+        - /usr/local/bin/fish
+        - /usr/bin/fish
+        - /bin/fish
+      executionTemplate: "PATH_TO_SCRIPTFILE"
+      extension: fish
+
+    - identifier: tcsh
+      executablePaths:
+        - /bin/tcsh
+        - /usr/bin/tcsh
+        - /usr/local/bin/tcsh
+      executionTemplate: "PATH_TO_SCRIPTFILE"
+      extension: tcsh
+
+    - identifier: ksh
+      executablePaths:
+        - /usr/local/bin/ksh
+        - /bin/ksh
+        - /usr/bin/ksh
+      executionTemplate: "PATH_TO_SCRIPTFILE"
+      extension: ksh
+
+    - identifier: nu
+      executablePaths:
+        - /usr/local/bin/nu
+        - /home/username/.cargo/bin/nu
+      executionTemplate: "PATH_TO_SCRIPTFILE"
+      extension: nu
+
+    - identifier: ion
+      executablePaths:
+        - /home/username/.cargo/bin/ion
+      executionTemplate: "PATH_TO_SCRIPTFILE"
+      extension: ion
+
+    - identifier: elvish
+      executablePaths:
+        - /usr/local/bin/elvish
+      executionTemplate: "PATH_TO_SCRIPTFILE"
+      extension: elvish
+
+    - identifier: dash
+      executablePaths:
+        - /usr/local/bin/dash
+      executionTemplate: "PATH_TO_SCRIPTFILE"
+      extension: dash
+
+    - identifier: sh
+      executablePaths:
+        - /bin/sh
+        - /usr/bin/sh
+        - /usr/local/bin/sh
+      executionTemplate: "PATH_TO_SCRIPTFILE"
+      extension: sh
+
+    - identifier: python
+      executablePaths:
+        - /usr/bin/python
+        - /usr/bin/python3
+        - /usr/local/bin/python
+        - /usr/local/bin/python3
+        - C:/Python39/python.exe
+        - C:/Python38/python.exe
+        - C:/Python37/python.exe
+      executionTemplate: "PATH_TO_SCRIPTFILE"
+      extension: py
+
 
 
 ################################################################

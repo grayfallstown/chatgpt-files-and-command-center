@@ -66,21 +66,5 @@ class CommandServiceTest {
 
         assertTrue(result.contains("Hello, World!"), "Expected output to contain 'Hello, World!'");
     }
-
-    @Test
-    void testValidateShell() {
-        String os = System.getProperty("os.name").toLowerCase();
-        if (os.contains("win")) {
-            assertEquals("cmd.exe", commandService.validateShell("cmd"));
-        } else {
-            assertEquals("/bin/bash", commandService.validateShell("bash"));
-        }
-    }
-
-    @Test
-    void testSanitizeCommand() {
-        String command = "echo Hello $USER";
-        String sanitizedCommand = commandService.sanitizeCommand(command);
-        assertEquals("echo Hello $USER", sanitizedCommand);
-    }
+    
 }

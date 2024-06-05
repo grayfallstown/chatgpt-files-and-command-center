@@ -8,7 +8,9 @@ import lombok.Data;
 @Data
 public class CommandRequest {
 
-    @Schema(description = "Command to be executed inside a shell appropriate for the system", required = true)
+    @Schema(description = "Command to be executed inside a shell appropriate for the system." +
+        "Can be an entire script, for example a simple python application when python is " +
+        "selected as shell", required = true)
     @NotEmpty(message = "Command must not be empty")
     private String command;
 

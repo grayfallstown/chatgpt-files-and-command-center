@@ -1,5 +1,6 @@
 package net.grayfallstown.chatgptfileandcommandcenter.system;
 
+import net.grayfallstown.chatgptfileandcommandcenter.command.ShellService;
 import net.grayfallstown.chatgptfileandcommandcenter.project.ProjectConfig;
 import net.grayfallstown.chatgptfileandcommandcenter.project.ProjectManager;
 import org.slf4j.Logger;
@@ -26,6 +27,9 @@ public class SystemInfoController {
     @Autowired
     private ProjectManager projectManager;
 
+    @Autowired
+    private ShellService shellService;
+
     @GetMapping
     public Map<String, Object> getSystemInfo(@PathVariable String apiKey) {
         ProjectConfig projectConfig = projectManager.getProjectConfig(apiKey);
@@ -38,14 +42,11 @@ public class SystemInfoController {
 
         systemInfo.put("os", osName);
         systemInfo.put("version", osVersion);
-
-        List<String> availableShells = new ArrayList<>();
+        systemInfo.put("availableShells", shellService.getAvailableShellNames());
         if (osName.contains("win")) {
             systemInfo.put("distribution", System.getProperty("os.name"));
             systemInfo.put("build", System.getProperty("os.version"));
             systemInfo.put("kernel", System.getProperty("os.arch"));
-            availableShells.add("cmd");
-            availableShells.add("powershell");
         } else {
             try {
                 ProcessBuilder processBuilder = new ProcessBuilder();
@@ -64,23 +65,11 @@ public class SystemInfoController {
                         systemInfo.put("distribution", line.split(":")[1].trim());
                     }
                 }
-
-                // Check for available shells
-                if (new java.io.File("/bin/bash").exists()) {
-                    availableShells.add("/bin/bash");
-                }
-                if (new java.io.File("/bin/sh").exists()) {
-                    availableShells.add("/bin/sh");
-                }
-                if (new java.io.File("/usr/bin/zsh").exists()) {
-                    availableShells.add("/usr/bin/zsh");
-                }
             } catch (Exception e) {
                 systemInfo.put("error", "Unable to determine distribution or kernel info: " + e.getMessage());
             }
         }
-
-        systemInfo.put("availableShells", availableShells);
+        
         logger.info("Returning system info: {}", systemInfo);
         return systemInfo;
     }

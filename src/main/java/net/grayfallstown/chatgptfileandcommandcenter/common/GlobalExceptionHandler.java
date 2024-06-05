@@ -2,6 +2,7 @@ package net.grayfallstown.chatgptfileandcommandcenter.common;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -9,6 +10,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 
 import net.grayfallstown.chatgptfileandcommandcenter.command.CommandsDisabledException;
+import net.grayfallstown.chatgptfileandcommandcenter.command.ShellNotFoundException;
+import net.grayfallstown.chatgptfileandcommandcenter.command.ShellService;
 import net.grayfallstown.chatgptfileandcommandcenter.file.FileNotFoundException;
 import net.grayfallstown.chatgptfileandcommandcenter.file.FileOperationException;
 import net.grayfallstown.chatgptfileandcommandcenter.history.GitOperationException;
@@ -18,6 +21,9 @@ import net.grayfallstown.chatgptfileandcommandcenter.project.UnknownProjectExcep
 public class GlobalExceptionHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
+    @Autowired
+    public ShellService shellService;
 
     @ExceptionHandler(UnknownProjectException.class)
     public ResponseEntity<Object> handleUnknownProjectException(UnknownProjectException ex, WebRequest request) {
@@ -55,6 +61,16 @@ public class GlobalExceptionHandler {
         String chatGPTHint = " Notify the User that this feature can be enabled in " +
             "the projects config.yaml by setting executeCommands to true and restarting " + 
             "ChatGPT File And Command Center.";
+        return new ResponseEntity<>(ex.getMessage() + chatGPTHint, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(ShellNotFoundException.class)
+    public ResponseEntity<Object> handleShellNotFoundException(ShellNotFoundException ex, WebRequest request) {
+        logger.error("{}.", ex.getMessage());
+        String chatGPTHint = " only shells available, address them by the listed identifier: " +
+            shellService.getAvailableShellNames() + ". If you think the user wants you " +
+            "to use that shell, tell him to add it to his application.yml and restart ChatGPT "
+            + "File And Command Center";
         return new ResponseEntity<>(ex.getMessage() + chatGPTHint, HttpStatus.BAD_REQUEST);
     }
 

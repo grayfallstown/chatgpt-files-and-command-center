@@ -4,34 +4,33 @@ import org.apache.commons.exec.*;
 import org.apache.commons.io.output.TeeOutputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
 import java.nio.file.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Map;
 
 @Service
 public class CommandService {
 
     private static final Logger logger = LoggerFactory.getLogger(CommandService.class);
 
-    public void executeShellCommand(String shell, String command, String workingDir, int timeout, OutputStream out) {
+    @Autowired
+    private ShellService shellService;
+
+    public void executeShellCommand(String shellIdentifier, String command, String workingDir, int timeout, OutputStream out) {
         try {
+            Shell shell = shellService.getShell(shellIdentifier);
             // Create a script file in ./logs/commands/ directory
             Path scriptFile = createScriptFile(shell, command);
             logger.info("Excetuting command sh: {}, cmd: {}, wd: {}, to: {}, sf: {}",
-                shell, command, workingDir, timeout, scriptFile);
-
-            // Create a command line to execute the script
-            CommandLine cmdLine = new CommandLine(shell);
-            if (shell.contains("cmd")) {
-                cmdLine.addArgument("/c");
-            } else {
-                cmdLine.addArgument("-c");
+                shellIdentifier, command, workingDir, timeout, scriptFile);
+            CommandLine cmdLine = new CommandLine(shell.getExistingExecutablePath().toString());
+            for (String argument: shell.getExecutionTemplate().split(" ")) {
+                cmdLine.addArgument(argument.replace("PATH_TO_SCRIPTFILE", scriptFile.toAbsolutePath().toString()));
             }
-            cmdLine.addArgument(scriptFile.toAbsolutePath().toString(), false);
 
             // Execute the command
             DefaultExecutor executor = new DefaultExecutor();
@@ -76,36 +75,15 @@ public class CommandService {
         }
     }
 
-    private Path createScriptFile(String shell, String command) throws IOException {
-        String scriptExtension = shell.contains("cmd") || shell.contains("powershell") ? ".bat" : ".sh";
+    private Path createScriptFile(Shell shell, String command) throws IOException {
+        String scriptExtension = shell.getExtension();
         String timestamp = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
         Path logDir = Paths.get("logs", "commands");
         Files.createDirectories(logDir);
-        Path scriptFile = logDir.resolve("command_" + timestamp + scriptExtension);
+        Path scriptFile = logDir.resolve("command_" + timestamp + "." + scriptExtension);
         Files.writeString(scriptFile, command);
         scriptFile.toFile().setExecutable(true);
         return scriptFile;
     }
 
-    public String validateShell(String shell) {
-        // Define allowed shells
-        Map<String, String> allowedShells = Map.of(
-            "bash", "/bin/bash",
-            "sh", "/bin/sh",
-            "cmd", "cmd.exe",
-            "powershell", "powershell.exe"
-        );
-
-        // Determine the default shell based on the operating system
-        String os = System.getProperty("os.name").toLowerCase();
-        String defaultShell = os.contains("win") ? "cmd.exe" : "/bin/bash";
-
-        // Return the validated shell or default shell if not found
-        return allowedShells.getOrDefault(shell.toLowerCase(), defaultShell);
-    }
-
-    public String sanitizeCommand(String command) {
-        // Keep the command as is for the script execution
-        return command.replace("`", "");
-    }
 }
