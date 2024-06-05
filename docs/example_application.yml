@@ -23,7 +23,7 @@ server:
 
 fileapi:
   recursionDepthLimit: 10
-  responseSizeLimit: 8000 # Size in characters
+  responseSizeLimit: 24000 # Size in characters
   deepDirectories:
     - bin
     - build
