@@ -1,6 +1,7 @@
 package net.grayfallstown.chatgptfileandcommandcenter.command;
 
 import org.apache.commons.exec.*;
+import org.apache.commons.io.output.TeeOutputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -35,11 +36,27 @@ public class CommandService {
             // Execute the command
             DefaultExecutor executor = new DefaultExecutor();
             executor.setWorkingDirectory(new File(workingDir));
-            executor.setStreamHandler(new PumpStreamHandler(out));
+            PipedOutputStream pipedOut = new PipedOutputStream();
+            PipedInputStream pipedIn = new PipedInputStream(pipedOut);
+            executor.setStreamHandler(new PumpStreamHandler(new TeeOutputStream(out, pipedOut)));
             ExecuteWatchdog watchdog = new ExecuteWatchdog(timeout * 1000L);
             executor.setWatchdog(watchdog);
 
             int exitValue = executor.execute(cmdLine);
+
+            new Thread(() -> {
+                try (BufferedReader reader = new BufferedReader(new InputStreamReader(pipedIn))) {
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        logger.info("commandoutput: {}", line);
+                    }
+                } catch (IOException e) {
+                    if (!e.getMessage().contains("Write end dead")) {
+                        logger.error("Failed to read command output", e);
+                    }
+                }
+            }).start();
+
             if (exitValue != 0) {
                 out.write(("ERROR: Command exited with value " + exitValue + "\n").getBytes());
                 logger.error("Command exited with value {}", exitValue);
@@ -60,7 +77,7 @@ public class CommandService {
     }
 
     private Path createScriptFile(String shell, String command) throws IOException {
-        String scriptExtension = shell.contains("cmd") ? ".bat" : ".sh";
+        String scriptExtension = shell.contains("cmd") || shell.contains("powershell") ? ".bat" : ".sh";
         String timestamp = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
         Path logDir = Paths.get("logs", "commands");
         Files.createDirectories(logDir);
