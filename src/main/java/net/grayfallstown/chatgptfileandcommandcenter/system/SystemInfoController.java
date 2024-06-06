@@ -1,22 +1,20 @@
 package net.grayfallstown.chatgptfileandcommandcenter.system;
 
-import net.grayfallstown.chatgptfileandcommandcenter.command.ShellService;
-import net.grayfallstown.chatgptfileandcommandcenter.project.ProjectConfig;
-import net.grayfallstown.chatgptfileandcommandcenter.project.ProjectManager;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import net.grayfallstown.chatgptfileandcommandcenter.command.ShellService;
+import net.grayfallstown.chatgptfileandcommandcenter.project.ProjectConfig;
 
 @RestController
 @RequestMapping("/api/{apiKey}/sysinfo")
@@ -25,15 +23,10 @@ public class SystemInfoController {
     private static final Logger logger = LoggerFactory.getLogger(SystemInfoController.class);
 
     @Autowired
-    private ProjectManager projectManager;
-
-    @Autowired
     private ShellService shellService;
 
     @GetMapping
-    public Map<String, Object> getSystemInfo(@PathVariable String apiKey) {
-        ProjectConfig projectConfig = projectManager.getProjectConfig(apiKey);
-
+    public Map<String, Object> getSystemInfo(@AuthenticationPrincipal ProjectConfig projectConfig) {
         Map<String, Object> systemInfo = new HashMap<>();
         systemInfo.put("systemDescription", projectConfig.getSystemDescription());
 
@@ -69,7 +62,7 @@ public class SystemInfoController {
                 systemInfo.put("error", "Unable to determine distribution or kernel info: " + e.getMessage());
             }
         }
-        
+
         logger.info("Returning system info: {}", systemInfo);
         return systemInfo;
     }
