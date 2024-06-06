@@ -175,6 +175,7 @@ management:
 logging:
   level:
     root: INFO
+    org.springframework.security.web.FilterChainProxy: INFO
     org.springframework.security: DEBUG
     net.grayfallstown: DEBUG
     org.springdoc: DEBUG

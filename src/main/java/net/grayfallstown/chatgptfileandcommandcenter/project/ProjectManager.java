@@ -1,13 +1,5 @@
 package net.grayfallstown.chatgptfileandcommandcenter.project;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
-import jakarta.annotation.PostConstruct;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -19,6 +11,16 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+
+import jakarta.annotation.PostConstruct;
 
 @Component
 public class ProjectManager {
@@ -91,7 +93,8 @@ public class ProjectManager {
     private static void restrictToOwner(Path filePath) {
         try {
             if (System.getProperty("os.name").toLowerCase().contains("win")) {
-                ProcessBuilder pb = new ProcessBuilder("icacls", filePath.toString(), "/inheritance:r", "/grant", System.getProperty("user.name") + ":(R,W)");
+                ProcessBuilder pb = new ProcessBuilder("icacls", filePath.toString(), "/inheritance:r", "/grant",
+                        System.getProperty("user.name") + ":(R,W)");
                 Process p = pb.start();
                 p.waitFor();
             } else {
@@ -99,14 +102,14 @@ public class ProjectManager {
                 Set<PosixFilePermission> permissions = new HashSet<>();
                 permissions.add(PosixFilePermission.OWNER_READ);
                 permissions.add(PosixFilePermission.OWNER_WRITE);
-    
+
                 // Set the file permissions
                 Files.setPosixFilePermissions(filePath, permissions);
             }
-        } catch(Exception e) {
+        } catch (Exception e) {
             throw new RuntimeException("could not restrict created apikey.txt to owner", e);
         }
-        
+
     }
 
     private boolean constantTimeCompare(String a, String b) {
@@ -119,4 +122,9 @@ public class ProjectManager {
         }
         return result == 0;
     }
+
+    public Set<String> getApiKeys() {
+        return projectConfigs.keySet();
+    }
+
 }

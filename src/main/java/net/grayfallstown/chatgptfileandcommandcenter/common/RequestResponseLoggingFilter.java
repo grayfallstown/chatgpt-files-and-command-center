@@ -1,8 +1,15 @@
 package net.grayfallstown.chatgptfileandcommandcenter.common;
 
+import java.io.IOException;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.FilterConfig;
@@ -11,13 +18,15 @@ import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.concurrent.atomic.AtomicInteger;
+import net.grayfallstown.chatgptfileandcommandcenter.project.ProjectManager;
 
 @Component
 public class RequestResponseLoggingFilter implements Filter {
 
     private static final Logger logger = LoggerFactory.getLogger(RequestResponseLoggingFilter.class);
+
+    @Autowired
+    private ProjectManager projectManager;
 
     private AtomicInteger counter = new AtomicInteger(0);
 
@@ -33,9 +42,12 @@ public class RequestResponseLoggingFilter implements Filter {
         HttpServletResponse httpResponse = (HttpServletResponse) response;
 
         // Log request URL and parameters
-        int id  = counter.incrementAndGet();
-        logger.info("Request {} URL: {} {}", id, httpRequest.getMethod(), httpRequest.getRequestURI());
-        httpRequest.getParameterMap().forEach((key, value) -> logger.info("Parameter: {}={}", key, String.join(",", value)));
+        int id = counter.incrementAndGet();
+        String sanitizedURL = obfuscateApiKeyInUrl(httpRequest.getRequestURI());
+
+        logger.info("Request {} URL: {} {}", id, httpRequest.getMethod(), sanitizedURL);
+        httpRequest.getParameterMap()
+                .forEach((key, value) -> logger.info("Parameter: {}={}", key, String.join(",", value)));
 
         // Proceed with the next filter in the chain
         chain.doFilter(request, response);
@@ -44,8 +56,19 @@ public class RequestResponseLoggingFilter implements Filter {
         logger.info("Response {} Status: {}", id, httpResponse.getStatus());
     }
 
-    @Override
-    public void destroy() {
-        // Cleanup code if needed
+    public static String obfuscateApiKeyInUrl(String url) {
+        String regex = "/api/([^/]+)/";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(url);
+
+        if (matcher.find()) {
+            String apiKey = matcher.group(1);
+            if (apiKey.length() > 2) {
+                String obfuscatedApiKey = apiKey.charAt(0) + "<obfuscated>" + apiKey.charAt(apiKey.length() - 1);
+                return url.replaceFirst(regex, "/api/" + obfuscatedApiKey + "/");
+            }
+        }
+        return url;
     }
+
 }
