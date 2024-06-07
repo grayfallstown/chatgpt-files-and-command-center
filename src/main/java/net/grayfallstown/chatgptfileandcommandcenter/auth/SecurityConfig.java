@@ -14,29 +14,32 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 public class SecurityConfig {
 
-    private final ApiKeyAuthenticationProvider apiKeyAuthenticationProvider;
-    private final ApiKeyAuthenticationFilter apiKeyAuthenticationFilter;
+        private final ApiKeyAuthenticationProvider apiKeyAuthenticationProvider;
+        private final ApiKeyAuthenticationFilter apiKeyAuthenticationFilter;
 
-    public SecurityConfig(ApiKeyAuthenticationProvider apiKeyAuthenticationProvider,
-            ApiKeyAuthenticationFilter apiKeyAuthenticationFilter) {
-        this.apiKeyAuthenticationProvider = apiKeyAuthenticationProvider;
-        this.apiKeyAuthenticationFilter = apiKeyAuthenticationFilter;
-    }
+        public SecurityConfig(ApiKeyAuthenticationProvider apiKeyAuthenticationProvider,
+                        ApiKeyAuthenticationFilter apiKeyAuthenticationFilter) {
+                this.apiKeyAuthenticationProvider = apiKeyAuthenticationProvider;
+                this.apiKeyAuthenticationFilter = apiKeyAuthenticationFilter;
+        }
 
-    @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(
-                        authorizationManagerRequestMatcherRegistry -> authorizationManagerRequestMatcherRegistry
-                                .requestMatchers("/v3/api-docs").permitAll()
-                                .anyRequest().authenticated())
-                .authenticationProvider(apiKeyAuthenticationProvider)
-                .addFilterBefore(apiKeyAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                .sessionManagement(httpSecuritySessionManagementConfigurer -> httpSecuritySessionManagementConfigurer
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .httpBasic(Customizer.withDefaults());
+        @Bean
+        public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+                http.csrf(AbstractHttpConfigurer::disable)
+                                .authorizeHttpRequests(
+                                                authorizationManagerRequestMatcherRegistry -> authorizationManagerRequestMatcherRegistry
+                                                                .requestMatchers("/v3/api-docs/**", "/swagger-ui/**",
+                                                                                "/swagger-ui.html", "/favicon.ico")
+                                                                .permitAll()
+                                                                .anyRequest().authenticated())
+                                .authenticationProvider(apiKeyAuthenticationProvider)
+                                .addFilterBefore(apiKeyAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                                .sessionManagement(
+                                                httpSecuritySessionManagementConfigurer -> httpSecuritySessionManagementConfigurer
+                                                                .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                                .httpBasic(Customizer.withDefaults());
 
-        return http.build();
-    }
+                return http.build();
+        }
 
 }

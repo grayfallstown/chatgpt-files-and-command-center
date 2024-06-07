@@ -1,18 +1,20 @@
 package net.grayfallstown.chatgptfileandcommandcenter.project;
 
-import lombok.Data;
-import net.grayfallstown.chatgptfileandcommandcenter.common.ValidationException;
+import java.io.File;
+import java.io.Serializable;
+import java.nio.file.Paths;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.Nulls;
 
-import java.io.File;
-import java.nio.file.Paths;
+import lombok.Data;
+import net.grayfallstown.chatgptfileandcommandcenter.common.ValidationException;
 
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class ProjectConfig {
+public class ProjectConfig implements Serializable {
 
     @JsonProperty("dir")
     private String dir;
@@ -60,7 +62,7 @@ public class ProjectConfig {
         File dir = new File(dirPath);
         if (!dir.exists() || !dir.isDirectory()) {
             throw new ValidationException(dirName + " does not exist or is not a directory: " +
-                dirPath);
+                    dirPath);
         }
     }
 
@@ -69,7 +71,7 @@ public class ProjectConfig {
         validateDirectoryExists(this.workingDir, "Working directory");
         if (executeCommands && restrictToWorkingDir) {
             throw new ValidationException("Project '" + dir +
-                "' has executeCommands true, but also restrictedToWorkingDir, which is not allowed.");
+                    "' has executeCommands true, but also restrictedToWorkingDir, which is not allowed.");
         }
     }
 }

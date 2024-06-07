@@ -3,6 +3,7 @@ package net.grayfallstown.chatgptfileandcommandcenter.auth;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -30,6 +31,11 @@ public class ApiKeyAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws jakarta.servlet.ServletException, java.io.IOException {
+        String uri = request.getRequestURI();
+        if (StringUtils.startsWithAny(uri, "/v3/api-docs", "/swagger-ui", "/favicon.ico")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
         String apiKey = extractApiKeyFromRequest(request);
 
         if (apiKey != null && SecurityContextHolder.getContext().getAuthentication() == null) {

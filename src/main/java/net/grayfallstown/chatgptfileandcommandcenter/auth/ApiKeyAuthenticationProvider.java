@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import net.grayfallstown.chatgptfileandcommandcenter.project.ProjectConfig;
 import net.grayfallstown.chatgptfileandcommandcenter.project.ProjectManager;
+import net.grayfallstown.chatgptfileandcommandcenter.project.UnknownProjectException;
 
 @Component
 public class ApiKeyAuthenticationProvider implements AuthenticationProvider {
@@ -24,17 +25,17 @@ public class ApiKeyAuthenticationProvider implements AuthenticationProvider {
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         String apiKey = (String) authentication.getPrincipal();
-        ProjectConfig project = projectManager.getProjectConfig(apiKey);
-
-        if (project == null) {
+        try {
+            ProjectConfig project = projectManager.getProjectConfig(apiKey);
+            return new ApiKeyAuthToken(project, apiKey, new ArrayList<>());
+        } catch (UnknownProjectException e) {
             throw new BadCredentialsException("Invalid API Key");
         }
-
-        return new UsernamePasswordAuthenticationToken(project, apiKey, new ArrayList<>());
     }
 
     @Override
     public boolean supports(Class<?> authentication) {
         return UsernamePasswordAuthenticationToken.class.isAssignableFrom(authentication);
     }
+
 }
