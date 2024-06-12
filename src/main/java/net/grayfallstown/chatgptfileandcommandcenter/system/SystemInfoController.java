@@ -11,13 +11,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import net.grayfallstown.chatgptfileandcommandcenter.command.ShellService;
 import net.grayfallstown.chatgptfileandcommandcenter.project.ProjectConfig;
 
 @RestController
-@RequestMapping("/api/{apiKey}/sysinfo")
+@RequestMapping("/api/sysinfo")
 public class SystemInfoController {
 
     private static final Logger logger = LoggerFactory.getLogger(SystemInfoController.class);
@@ -26,7 +27,8 @@ public class SystemInfoController {
     private ShellService shellService;
 
     @GetMapping
-    public Map<String, Object> getSystemInfo(@AuthenticationPrincipal ProjectConfig projectConfig) {
+    public Map<String, Object> getSystemInfo(@AuthenticationPrincipal ProjectConfig projectConfig,
+            @RequestParam(required = true) String projectID) {
         Map<String, Object> systemInfo = new HashMap<>();
         systemInfo.put("systemDescription", projectConfig.getSystemDescription());
 

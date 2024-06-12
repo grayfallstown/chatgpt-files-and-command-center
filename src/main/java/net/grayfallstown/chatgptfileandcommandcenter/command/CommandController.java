@@ -24,7 +24,7 @@ import jakarta.validation.Valid;
 import net.grayfallstown.chatgptfileandcommandcenter.project.ProjectConfig;
 
 @RestController
-@RequestMapping("/api/{apiKey}/command")
+@RequestMapping("/api/command")
 public class CommandController {
 
     private static final Logger logger = LoggerFactory.getLogger(CommandController.class);

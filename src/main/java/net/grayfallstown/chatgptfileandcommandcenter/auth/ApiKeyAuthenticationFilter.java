@@ -1,8 +1,5 @@
 package net.grayfallstown.chatgptfileandcommandcenter.auth;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -48,15 +45,7 @@ public class ApiKeyAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private String extractApiKeyFromRequest(HttpServletRequest request) {
-        // Extract API key from the URL path
-        String uri = request.getRequestURI();
-        Pattern pattern = Pattern.compile("/api/([^/]+)/");
-        Matcher matcher = pattern.matcher(uri);
-        if (matcher.find()) {
-            return matcher.group(1);
-        }
-
-        return "apikey not found in url path";
+        return request.getParameter("projectID");
     }
 
 }

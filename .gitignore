@@ -17,6 +17,7 @@ historyRepo
 application.yml
 notes.txt
 run.bat
+chatgpt-command-and-control-center.*.log
 
 
 ### STS ###
