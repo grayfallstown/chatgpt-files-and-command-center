@@ -1,15 +1,5 @@
 package net.grayfallstown.chatgptfileandcommandcenter.file;
 
-import net.grayfallstown.chatgptfileandcommandcenter.history.GitSyncService;
-import net.grayfallstown.chatgptfileandcommandcenter.project.ProjectConfig;
-
-import org.apache.commons.io.FileUtils;
-import org.eclipse.jgit.ignore.IgnoreNode;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -19,6 +9,16 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import org.apache.commons.io.FileUtils;
+import org.eclipse.jgit.ignore.IgnoreNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import net.grayfallstown.chatgptfileandcommandcenter.history.GitSyncService;
+import net.grayfallstown.chatgptfileandcommandcenter.project.ProjectConfig;
 
 @Service
 public class FileService {
@@ -33,12 +33,13 @@ public class FileService {
     public void writeFile(String path, String content, ProjectConfig projectConfig) {
         try {
             Path filePath = validatePathInsideWorkingDir(path, projectConfig);
-            FileUtils.forceMkdirParent(filePath.getParent().toFile());
+            FileUtils.forceMkdirParent(filePath.toFile());
             if (Files.exists(filePath)) {
                 Files.delete(filePath);
             }
+            logger.info("filepath: {}, path: {}", filePath, path);
             Files.write(filePath, content.getBytes(),
-                StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE);
+                    StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE);
             logger.info("File written: {}", path);
         } catch (IOException e) {
             logger.error("Failed to write file: {}", path, e);
@@ -69,7 +70,8 @@ public class FileService {
             logger.info("File moved from {} to {}", from, to);
         } catch (IOException e) {
             logger.error("Failed to move file from {} to {}", from, to, e);
-            throw new FileOperationException("Failed to move file from " + from + " to " + to + ": " + e.getMessage(), e);
+            throw new FileOperationException("Failed to move file from " + from + " to " + to + ": " + e.getMessage(),
+                    e);
         }
     }
 
@@ -85,7 +87,8 @@ public class FileService {
         }
     }
 
-    public String listFiles(String path, boolean recursive, boolean ignoreGitIgnore, boolean foldersOnly, ProjectConfig projectConfig) {
+    public String listFiles(String path, boolean recursive, boolean ignoreGitIgnore, boolean foldersOnly,
+            ProjectConfig projectConfig) {
         try {
             Path dirPath = validatePathInsideWorkingDir(path, projectConfig);
             StringBuilder fileList = new StringBuilder();
@@ -94,21 +97,21 @@ public class FileService {
             int limit = fileAPIConfig.getResponseSizeLimit() - responseTooLargeErrror.length();
             logger.debug("response limit {}", limit);
             List<Path> foundPaths = Files.walk(dirPath, recursive ? Integer.MAX_VALUE : 1)
-                .filter((filterPath) -> {
-                    if (filterPath.toString().contains(File.separator + ".git" + File.separator)) {
-                        return false;
-                    }
-                    if (!ignoreGitIgnore) {
-                        if (gitSyncService.isGitIgnored(dirPath, filterPath, ignoreNode)) {
+                    .filter((filterPath) -> {
+                        if (filterPath.toString().contains(File.separator + ".git" + File.separator)) {
                             return false;
                         }
-                    }
-                    if (foldersOnly) {
-                        return Files.isDirectory(filterPath);
-                    } else {
-                        return Files.isRegularFile(filterPath) || Files.isDirectory(filterPath);
-                    }
-                }).collect(Collectors.toList());
+                        if (!ignoreGitIgnore) {
+                            if (gitSyncService.isGitIgnored(dirPath, filterPath, ignoreNode)) {
+                                return false;
+                            }
+                        }
+                        if (foldersOnly) {
+                            return Files.isDirectory(filterPath);
+                        } else {
+                            return Files.isRegularFile(filterPath) || Files.isDirectory(filterPath);
+                        }
+                    }).collect(Collectors.toList());
 
             Path workingDir = Paths.get(projectConfig.getWorkingDir());
             for (Path foundPath : foundPaths) {
