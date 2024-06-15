@@ -1,9 +1,11 @@
 package net.grayfallstown.chatgptfileandcommandcenter.common;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,13 +49,27 @@ public class RequestResponseLoggingFilter implements Filter {
 
         logger.info("Request {} URL: {} {}", id, httpRequest.getMethod(), sanitizedURL);
         httpRequest.getParameterMap()
-                .forEach((key, value) -> logger.info("Parameter: {}={}", key, String.join(",", value)));
+                .forEach((key, value) -> {
+                    if (key.equals("projectID")) {
+                        value = Arrays.asList(value).stream()
+                                .map(this::obfuscateApiKeyParameter).collect(Collectors.toList())
+                                .toArray(new String[0]);
+                    }
+                    logger.info("Parameter: {}={}", key, String.join(",", value));
+                });
 
         // Proceed with the next filter in the chain
         chain.doFilter(request, response);
 
         // Log response status
         logger.info("Response {} Status: {}", id, httpResponse.getStatus());
+    }
+
+    private String obfuscateApiKeyParameter(String value) {
+        if (value != null) {
+            return value.charAt(0) + "<obfuscated>" + value.charAt(value.length() - 1);
+        }
+        return null;
     }
 
     public static String obfuscateApiKeyInUrl(String url) {
